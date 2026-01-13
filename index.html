@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>18 YEARS: THE ULTIMATE PARTY</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Exo+2:wght@300;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --dark: #020205;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+
+        body {
+            background: var(--dark);
+            color: #fff;
+            font-family: 'Exo 2', sans-serif;
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+
+        /* Loading Screen / Intro */
+        #intro-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            transition: 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .enter-btn {
+            padding: 20px 50px;
+            font-family: 'Orbitron', sans-serif;
+            background: none; border: 2px solid var(--neon-blue);
+            color: var(--neon-blue); font-size: 1.5rem; cursor: pointer;
+            box-shadow: 0 0 20px var(--neon-blue);
+            transition: 0.3s; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+        }
+
+        .enter-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 50px var(--neon-blue); }
+
+        /* Background Visuals */
+        #vanta-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+
+        section { min-height: 100vh; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; position: relative; }
+
+        .container { max-width: 1200px; width: 100%; }
+
+        /* Typography */
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 5px; }
+
+        .cyber-text {
+            font-size: clamp(3rem, 10vw, 7rem);
+            background: linear-gradient(to right, #fff 20%, var(--neon-blue) 40%, var(--neon-purple) 60%, #fff 80%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            text-fill-color: transparent;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+        }
+
+        @keyframes shine { to { background-position: 200% center; } }
+
+        /* Glass Cards */
+        .cyber-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-left: 5px solid var(--neon-blue);
+            padding: 40px; border-radius: 5px;
+            margin: 20px 0; position: relative; overflow: hidden;
+        }
+
+        .cyber-card::after {
+            content: ""; position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,242,255,0.1), transparent);
+            transition: 0.5s;
+        }
+        .cyber-card:hover::after { left: 100%; }
+
+        /* Timer */
+        .countdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 40px 0; }
+        .count-item { text-align: center; background: rgba(0,0,0,0.5); padding: 20px; border: 1px solid var(--neon-purple); border-radius: 10px; }
+        .count-item span { display: block; font-size: 2rem; font-weight: 900; color: var(--neon-blue); }
+
+        /* Locations & Buttons */
+        .loc-btn {
+            display: inline-block; padding: 15px 30px; margin-top: 20px;
+            border: 1px solid var(--neon-blue); color: #fff; text-decoration: none;
+            transition: 0.3s; font-weight: bold; position: relative;
+        }
+        .loc-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 30px var(--neon-blue); }
+
+        /* No Button Logic */
+        .rsvp-zone { height: 300px; display: flex; justify-content: center; align-items: center; position: relative; width: 100%; }
+        #no-btn {
+            position: absolute; padding: 15px 40px; font-family: 'Orbitron';
+            background: none; border: 2px solid var(--neon-purple); color: var(--neon-purple);
+            border-radius: 5px; transition: 0.1s ease-out; z-index: 100;
+        }
+        #yes-btn { padding: 15px 60px; font-family: 'Orbitron'; background: var(--neon-blue); color: #000; border: none; cursor: pointer; box-shadow: 0 0 20px var(--neon-blue); z-index: 101; }
+
+        /* Scroll Progress */
+        #progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--neon-blue); z-index: 10000; width: 0%; box-shadow: 0 0 10px var(--neon-blue); }
+
+        /* Custom Meme Section */
+        .meme-window {
+            width: 100%; max-width: 500px; border: 2px solid #333;
+            background: #000; border-radius: 10px; overflow: hidden;
+        }
+        .window-header { background: #333; padding: 5px 15px; display: flex; gap: 5px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        /* Audio Visualizer (Fake) */
+        .visualizer { display: flex; align-items: flex-end; gap: 3px; height: 30px; }
+        .bar { width: 4px; background: var(--neon-blue); animation: bar-grow 0.5s ease-in-out infinite alternate; }
+        @keyframes bar-grow { from { height: 5px; } to { height: 30px; } }
+
+    </style>
+</head>
+<body>
+
+    <div id="progress"></div>
+    <div id="vanta-bg"></div>
+
+    <div id="intro-overlay">
+        <h2 style="margin-bottom: 30px; color: #fff;">SYSTEM CHECK: 18+</h2>
+        <button class="enter-btn" onclick="startExperience()">INITIALIZE PARTY</button>
+        <p style="margin-top: 20px; font-size: 0.7rem; opacity: 0.5;">[ PRESS TO START AUDIO & VISUALS ]</p>
+    </div>
+
+    <div id="main-content" style="display:none;">
+        
+        <section>
+            <div class="container">
+                <p data-aos="fade-right">[ PROTOCOL: BIRTHDAY ]</p>
+                <h1 class="cyber-text" data-aos="zoom-out">AGE: 18</h1>
+                <h3 data-aos="fade-left" style="color: var(--neon-purple);">LOADING ADULTHOOD... 99%</h3>
+                
+                <div class="countdown" data-aos="fade-up">
+                    <div class="count-item"><span id="days">00</span> DAYS</div>
+                    <div class="count-item"><span id="hours">00</span> HR</div>
+                    <div class="count-item"><span id="mins">00</span> MIN</div>
+                    <div class="count-item"><span id="secs">00</span> SEC</div>
+                </div>
+            </div>
+            <div class="visualizer">
+                <div class="bar" style="animation-delay: 0.1s"></div>
+                <div class="bar" style="animation-delay: 0.3s"></div>
+                <div class="bar" style="animation-delay: 0.2s"></div>
+                <div class="bar" style="animation-delay: 0.5s"></div>
+                <div class="bar" style="animation-delay: 0.4s"></div>
+            </div>
+        </section>
+
+        <section>
+            <h2 data-aos="fade-down">CURRENT VIBE</h2>
+            <div class="cyber-card" data-aos="flip-up">
+                <div class="meme-window">
+                    <div class="window-header">
+                        <div class="dot" style="background: #ff5f56"></div>
+                        <div class="dot" style="background: #ffbd2e"></div>
+                        <div class="dot" style="background: #27c93f"></div>
+                        <span style="font-size: 10px; margin-left: 10px; color: #aaa;">meme_v1.exe</span>
+                    </div>
+                    <img src="meme.jpeg" style="width: 100%; display: block;">
+                </div>
+                <p style="margin-top: 20px; line-height: 1.6;">
+                    3 августа 2026 года. Этот день войдет в историю как начало конца моей спокойной жизни. 
+                    Готовьте печень, нервы и лучшие наряды.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2 data-aos="zoom-in">COORDINATES</h2>
+            <div class="container" style="display: flex; flex-wrap: wrap; justify-content: space-around;">
+                
+                <div class="cyber-card" style="flex: 1; min-width: 300px; margin: 15px;" data-aos="fade-right">
+                    <h3>01. THE GATHERING</h3>
+                    <p>18:00 | Начальная точка сбора</p>
+                    <p style="opacity: 0.6; font-size: 0.8rem;">ул. Неоновая, д. 18</p>
+                    <a href="https://maps.google.com" target="_blank" class="loc-btn">GPS TRACKER</a>
+                </div>
+
+                <div class="cyber-card" style="flex: 1; min-width: 300px; margin: 15px;" data-aos="fade-left">
+                    <h3>02. THE AFTERMATH</h3>
+                    <p>22:00 | Главная тусовка</p>
+                    <p style="opacity: 0.6; font-size: 0.8rem;">Лофт "Cyber Space"</p>
+                    <a href="https://maps.google.com" target="_blank" class="loc-btn">GPS TRACKER</a>
+                </div>
+
+            </div>
+        </section>
+
+        <section>
+            <h2 data-aos="fade-up">CONFIRM STATUS</h2>
+            <div class="cyber-card" style="width: 100%; max-width: 600px; text-align: center;">
+                <p style="margin-bottom: 40px;">Система должна знать: ты с нами или ты слабое звено?</p>
+                
+                <div class="rsvp-zone">
+                    <button id="yes-btn" onclick="acceptInvitation()">I'M IN! 🔥</button>
+                    <button id="no-btn" onmouseover="moveNo()" onclick="moveNo()">NO</button>
+                </div>
+            </div>
+        </section>
+
+        <footer style="padding: 40px; text-align: center; opacity: 0.3; font-size: 0.8rem;">
+            [ ENCRYPTED INVITATION v4.0 ] <br> NO ESCAPE POSSIBLE
+        </footer>
+    </div>
+
+    <audio id="party-music" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+    <script>
+        // Инициализация Vanta.js (Сетка на фоне)
+        let vantaEffect;
+        
+        function startExperience() {
+            // Прячем оверлей
+            document.getElementById('intro-overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('intro-overlay').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                AOS.init({ duration: 1000 });
+                
+                // Включаем музыку
+                const music = document.getElementById('party-music');
+                music.play();
+                
+                // Запускаем фон
+                vantaEffect = VANTA.NET({
+                    el: "#vanta-bg",
+                    mouseControls: true,
+                    touchControls: true,
+                    gyroControls: true,
+                    minHeight: 200.00,
+                    minWidth: 200.00,
+                    scale: 1.00,
+                    scaleMobile: 1.00,
+                    color: 0x00f2ff,
+                    backgroundColor: 0x020205,
+                    points: 12.00,
+                    maxDistance: 24.00,
+                    spacing: 16.00
+                });
+
+                // Голосовое приветствие
+                speak("Привет! Приглашаю тебя на своё восемнадцати летие, будет весело, не будь лохом прихади!!");
+            }, 1000);
+        }
+
+        // Таймер
+        const target = new Date("Aug 3, 2026 00:00:00").getTime();
+        setInterval(() => {
+            const now = new Date().getTime();
+            const d = target - now;
+            document.getElementById("days").innerText = Math.floor(d / (1000 * 60 * 60 * 24));
+            document.getElementById("hours").innerText = Math.floor((d % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            document.getElementById("mins").innerText = Math.floor((d % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById("secs").innerText = Math.floor((d % (1000 * 60)) / 1000);
+            
+            // Прогресс бар скролла
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress").style.width = scrolled + "%";
+        }, 1000);
+
+        // Кнопка НЕТ
+        function moveNo() {
+            const btn = document.getElementById('no-btn');
+            const x = Math.random() * (window.innerWidth - btn.clientWidth);
+            const y = Math.random() * (window.innerHeight - btn.clientHeight);
+            btn.style.position = 'fixed';
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+        }
+
+        // Принятие приглашения
+        function acceptInvitation() {
+            confetti({
+                particleCount: 150,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#00f2ff', '#bc13fe']
+            });
+            speak("Отлично! Ты не лох! Я жду тебя, если есть вопросы пиши мне");
+            alert("ДОСТУП РАЗРЕШЕН. ТЫ В СПИСКЕ! 🔥");
+        }
+
+        // Синтез речи
+        function speak(text) {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = 'ru-RU';
+            msg.rate = 0.9;
+            window.speechSynthesis.speak(msg);
+        }
+    </script>
+</body>
+</html>
